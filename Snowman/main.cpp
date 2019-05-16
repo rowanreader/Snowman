@@ -1,3 +1,5 @@
+/*
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QWidget>
 #include <QFile>
@@ -204,6 +206,205 @@ int main(int argc, char *argv[])
 
 	ui.QuarterWidget->setSceneGraph(root); // format?? add root to widget?
 
+	viewer->show(); // show widget
+	return a.exec();
+}
+
+*/
+
+
+
+
+#include <QtCore/QCoreApplication>
+#include <QtWidgets/QApplication>
+
+#include <QtWidgets/QWidget>
+#include <QFile>
+
+//#include <QTextStream>
+#include <Inventor/nodes/SoBaseColor.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoSphere.h>
+#include <Inventor/nodes/SoCylinder.h>
+#include <Inventor/nodes/SoCone.h>
+#include <Inventor/nodes/SoLineSet.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoRotation.h>
+#include <Inventor/nodes/SoBaseColor.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoTransform.h>
+#include <Inventor/fields/SoMFVec3f.h>
+#include <Inventor/SbVec3f.h>
+
+
+#include <Quarter/Quarter.h>
+#include <Quarter/QuarterWidget.h>
+#include <Quarter/eventhandlers/DragDropHandler.h>
+#include <Quarter/ui_QuarterViewer.h>
+
+
+#include <string.h>
+#include <stdlib.h>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+using namespace System;
+using namespace std;
+using namespace SIM::Coin3D::Quarter;
+int main(int argc, char *argv[])
+{
+	
+	QApplication a(argc, argv);
+	Quarter::init();
+
+	QWidget * viewer = new QWidget;
+	Ui::QuarterViewer ui;
+
+	
+	ui.setupUi(viewer);
+	viewer->resize(600, 800);
+	
+	SoSeparator * root = new SoSeparator;
+	root->ref();
+	// display breast
+	SoInput in;
+	in.openFile("S1.iv");
+	SoSeparator* file_root = SoDB::readAll(&in);
+	
+	root->addChild(file_root);
+	
+	// display points
+	ifstream areola("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\output.txt");
+	
+	string hold;
+	string num = "";
+	int k;
+	int found;
+	float coords[3] = { 0,0,0 };
+	//cout << "Hello World" << endl;
+	while (getline(areola, hold)) {
+		k = 0;
+		found = 0; // we know there are only 2 white spaces (but must add last num)
+		while (found < 3) {
+			if (hold[k] != ' ') {
+				num += hold[k];
+			}
+			else {
+				coords[found] = stof(num);
+				found++;
+				num = "";
+			}
+			k++;
+		}
+		SoSeparator * pt = new SoSeparator;
+		root->addChild(pt);
+		SoMaterial * o = new SoMaterial();
+		o->diffuseColor.setValue(1, 0, 0);
+		SoSphere * sphere = new SoSphere();
+		SoTransform * trans = new SoTransform();
+		sphere->radius = 1;
+		trans->translation.setValue(coords[0], coords[1], coords[2]);
+		pt->addChild(o);
+		pt->addChild(trans);
+		pt->addChild(sphere);
+		root->addChild(pt);
+		
+	}
+
+	ifstream normal("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\normals.txt");
+	vector<vector<float>> normals;
+	// first in normals will be index value (face id)
+	vector<float> temp;
+	int count = 0;
+	num = "";
+	
+	while (getline(normal, hold)) {
+		k = 0;
+		found = 0; // we know there are only 3 white spaces (but must add last num, exclude 1st num)
+		
+		while (found < 4) {
+			if (hold[k] != ' ') {
+				num += hold[k];
+			}
+			else {				
+				if (found > 0) {
+					temp.push_back(stof(num));					
+				}
+				num = "";
+				found++;
+			}
+			k++;
+		}
+		normals.push_back(temp);
+		temp.clear();
+	}
+	vector<vector<float>> allCoords;
+	///////////////////
+	// display surface points and vectors
+	ifstream spts("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\surface points.txt");
+	num = "";
+
+	count = 0;
+	//cout << "Hello World" << endl;
+	while (getline(spts, hold)) {
+		k = 0;
+		found = 0; // we know there are only 2 white spaces (but must add last num)
+		while (found < 3) {
+			if (hold[k] != ' ') {
+				num += hold[k];
+			}
+			else {
+				coords[found] = stof(num);
+				temp.push_back(coords[found]);
+				found++;
+				num = "";
+			}
+			k++;
+		}
+		SoSeparator * pt = new SoSeparator;
+		root->addChild(pt);
+		SoMaterial * o = new SoMaterial();
+		o->diffuseColor.setValue(0, 1, 0);
+		//SoCylinder * cyl = new SoCylinder();
+		SoSphere * cyl = new SoSphere();
+		SoTransform * trans = new SoTransform();
+		cyl->radius = 1;
+		//cyl->height = 3;
+		trans->translation.setValue(coords[0], coords[1], coords[2]);
+		allCoords.push_back(temp);
+		temp.clear();
+		pt->addChild(o);
+		pt->addChild(trans);
+		pt->addChild(cyl);
+		root->addChild(pt);
+		count++;
+	}
+
+	for (int i = 0; i < count; i++) {
+		SoSeparator * line = new SoSeparator;
+		root->addChild(line);
+		SoMaterial * p = new SoMaterial();
+		p->diffuseColor.setValue(0, 0, 1);
+
+		SoCoordinate3 *pt1 = new SoCoordinate3;
+		SbVec3f vec1(allCoords[i][0], allCoords[i][1], allCoords[i][2]);
+		SbVec3f vec2(50*normals[i][0], 50*normals[i][1], 50*normals[i][2]);
+		SoTransform * trans = new SoTransform;
+		trans->translation.setValue(allCoords[i][0], allCoords[i][1], allCoords[i][2]);
+		pt1->point.setValue(vec1);
+		pt1->point.setValue(vec2);
+
+		SoLineSet * ln = new SoLineSet;
+		ln->numVertices.setValue(2);
+		line->addChild(p);
+		line->addChild(trans);
+		line->addChild(pt1);
+		line->addChild(ln);
+	}
+
+
+	ui.QuarterWidget->setSceneGraph(root); // format?? add root to widget?
 	viewer->show(); // show widget
 	return a.exec();
 }

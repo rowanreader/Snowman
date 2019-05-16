@@ -77,8 +77,10 @@
       <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QUARTER_NOT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;C:\Coin3D\include;C:\Users\Jacqueline\Documents\QuarterClone\quarter\src;C:\Users\Jacqueline\Documents\Visual Studio 2015\Projects\Snowman;C:\Users\Jacqueline\Documents\QuarterClone\quarter\quarter_build\cpack.d\_CPack_Packages\NSIS\quarter-1.0.1-win64\development\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;C:\Coin3D\include;C:\Users\Jacqueline\Documents\QuarterClone\quarter\src;C:\Users\Jacqueline\Documents\Visual Studio 2015\Projects\Snowman;C:\Users\Jacqueline\Documents\QuarterClone\quarter\quarter_build\cpack.d\_CPack_Packages\NSIS\quarter-1.0.1-win64\development\include;C:\Users\Jacqueline\Documents\QuarterClone\quarter\include;C:\Qt\5.12.3\msvc2015_64\include\QtUiTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <CompileAsManaged>true</CompileAsManaged>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,7 +91,7 @@
     </Link>
     <QtMoc>
       <Define>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QUARTER_NOT_DLL;%(PreprocessorDefinitions)</Define>
-      <IncludePath>.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;C:\Coin3D\include;C:\Users\Jacqueline\Documents\QuarterClone\quarter\src;C:\Users\Jacqueline\Documents\Visual Studio 2015\Projects\Snowman;C:\Users\Jacqueline\Documents\QuarterClone\quarter\quarter_build\cpack.d\_CPack_Packages\NSIS\quarter-1.0.1-win64\development\include;%(AdditionalIncludeDirectories)</IncludePath>
+      <IncludePath>.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;C:\Coin3D\include;C:\Users\Jacqueline\Documents\QuarterClone\quarter\src;C:\Users\Jacqueline\Documents\Visual Studio 2015\Projects\Snowman;C:\Users\Jacqueline\Documents\QuarterClone\quarter\quarter_build\cpack.d\_CPack_Packages\NSIS\quarter-1.0.1-win64\development\include;C:\Users\Jacqueline\Documents\QuarterClone\quarter\include;C:\Qt\5.12.3\msvc2015_64\include\QtUiTools;%(AdditionalIncludeDirectories)</IncludePath>
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
