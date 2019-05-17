@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
 			k++;
 		}
 		SoSeparator * pt = new SoSeparator;
-		root->addChild(pt);
+		//root->addChild(pt);
 		SoMaterial * o = new SoMaterial();
 		o->diffuseColor.setValue(1, 0, 0);
 		SoSphere * sphere = new SoSphere();
@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 		pt->addChild(o);
 		pt->addChild(trans);
 		pt->addChild(sphere);
-		root->addChild(pt);
+		//root->addChild(pt);
 		
 	}
 
@@ -346,7 +346,6 @@ int main(int argc, char *argv[])
 	num = "";
 
 	count = 0;
-	//cout << "Hello World" << endl;
 	while (getline(spts, hold)) {
 		k = 0;
 		found = 0; // we know there are only 2 white spaces (but must add last num)
