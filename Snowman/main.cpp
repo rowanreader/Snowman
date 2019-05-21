@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
 	root->addChild(file_root);
 	
 	// display points
-	ifstream areola("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\output.txt");
+	ifstream areola("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\output2.txt");
 	
 	string hold;
 	string num = "";
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 		SoSeparator * pt = new SoSeparator;
 		//root->addChild(pt);
 		SoMaterial * o = new SoMaterial();
-		o->diffuseColor.setValue(1, 0, 0);
+		o->diffuseColor.setValue(1, 1, 1);
 		SoSphere * sphere = new SoSphere();
 		SoTransform * trans = new SoTransform();
 		sphere->radius = 1;
@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 		pt->addChild(o);
 		pt->addChild(trans);
 		pt->addChild(sphere);
-		//root->addChild(pt);
+		root->addChild(pt);
 		
 	}
 
@@ -339,6 +339,14 @@ int main(int argc, char *argv[])
 		normals.push_back(temp);
 		temp.clear();
 	}
+
+	///// get all angles
+	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\angles.txt");
+	vector<float> angles;
+	while (getline(ang, hold)) {
+		angles.push_back(stof(hold));
+	}
+
 	vector<vector<float>> allCoords;
 	///////////////////
 	// display surface points and vectors
@@ -379,13 +387,23 @@ int main(int argc, char *argv[])
 		root->addChild(pt);
 		count++;
 	}
-
+	int dirNum =49; // from matlab (actual-1 cuz 0 based index) WILL NEED TO CHANGE HERE IF CHANGES IN MATLAB
+	int ptCount = 0; // what line we are on
+	int j = 0; // where we are in the line
 	for (int i = 0; i < count; i++) {
 		SoSeparator * line = new SoSeparator;
 		root->addChild(line);
 		SoMaterial * p = new SoMaterial();
 		p->diffuseColor.setValue(0, 0, 1);
-
+		if (angles[ptCount] > 12 && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
+			p->diffuseColor.setValue(1, 0, 0);
+		}
+		if (j == dirNum - 1){
+			j = 0;
+			ptCount--; // cuz we're moving to the next line, must undo increment
+		}
+		j++;
+		ptCount++;
 		SoCoordinate3 *pt1 = new SoCoordinate3;
 		SbVec3f vec1(allCoords[i][0], allCoords[i][1], allCoords[i][2]);
 		SbVec3f vec2(50*normals[i][0], 50*normals[i][1], 50*normals[i][2]);
