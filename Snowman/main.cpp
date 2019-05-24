@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
 	root->addChild(file_root);
 	
 	// display points
-	ifstream areola("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\output2.txt");
+	ifstream areola("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\output2.txt");
 	
 	string hold;
 	string num = "";
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
 		
 	}
 
-	ifstream normal("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\normals.txt");
+	ifstream normal("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\normals.txt");
 	vector<vector<float>> normals;
 	// first in normals will be index value (face id)
 	vector<float> temp;
@@ -341,17 +341,17 @@ int main(int argc, char *argv[])
 		temp.clear();
 	}
 
-	///// get all angles
-	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\angles.txt");
-	vector<float> angles;
+	///// get all angles - concavity now
+	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\concavity.txt");
+	vector<int> concavity;
 	while (getline(ang, hold)) {
-		angles.push_back(stof(hold));
+		concavity.push_back(stof(hold));
 	}
 	
 	vector<vector<float>> allCoords;
 	///////////////////
 	// display surface points and vectors
-	ifstream spts("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance\\surface points.txt");
+	ifstream spts("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\surface points.txt");
 	num = "";
 
 	count = 0;
@@ -416,7 +416,7 @@ int main(int argc, char *argv[])
 		root->addChild(line);
 		SoMaterial * p = new SoMaterial();
 		p->diffuseColor.setValue(0, 0, 1);
-		if (angles[ptCount] > thresh && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
+		if (concavity[ptCount] == 1 && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
 			p->diffuseColor.setValue(1, 0, 0);
 		}
 		if (j == dirNum - 1){
@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
 		line->addChild(pt1);
 		line->addChild(ln);
 	}
-
+	/*
 	// use plane.txt to fit a plane
 	ifstream planeFile("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\plane.txt");
 	vector<vector<float>> plane;
@@ -487,7 +487,7 @@ int main(int argc, char *argv[])
 	drawplane->addChild(rotate);
 	
 	drawplane->addChild(cube);
-
+	*/
 	ui.QuarterWidget->setSceneGraph(root); // format?? add root to widget?
 	viewer->show(); // show widget
 	return a.exec();
