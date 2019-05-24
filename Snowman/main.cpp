@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/fields/SoMFVec3f.h>
 #include <Inventor/SbVec3f.h>
-
+#include <Inventor/nodes/SoCube.h>
 
 #include <Quarter/Quarter.h>
 #include <Quarter/QuarterWidget.h>
@@ -248,6 +248,7 @@ int main(int argc, char *argv[])
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 using namespace System;
 using namespace std;
@@ -346,7 +347,7 @@ int main(int argc, char *argv[])
 	while (getline(ang, hold)) {
 		angles.push_back(stof(hold));
 	}
-
+	
 	vector<vector<float>> allCoords;
 	///////////////////
 	// display surface points and vectors
@@ -390,12 +391,32 @@ int main(int argc, char *argv[])
 	int dirNum =49; // from matlab (actual-1 cuz 0 based index) WILL NEED TO CHANGE HERE IF CHANGES IN MATLAB
 	int ptCount = 0; // what line we are on
 	int j = 0; // where we are in the line
+	int thresh = 20; // THIS IS WHAT YOU NEED TO CHANGE IN FITPLANE TO MATCH
+	/*
+	SoSeparator * zAxis = new SoSeparator;
+	root->addChild(zAxis);
+	SoMaterial * p = new SoMaterial;
+	p->diffuseColor.setValue(1, 1, 1);
+	SoCoordinate3 *pt1 = new SoCoordinate3;
+	SbVec3f vec1(0,1,0);
+	SbVec3f vec2(0,100,0);
+	pt1->point.setValue(vec1);
+	pt1->point.setValue(vec2);
+
+	SoLineSet * ln = new SoLineSet;
+	ln->numVertices.setValue(2);
+	zAxis->addChild(p);
+	zAxis->addChild(pt1);
+	zAxis->addChild(ln);
+	*/
+
+
 	for (int i = 0; i < count; i++) {
 		SoSeparator * line = new SoSeparator;
 		root->addChild(line);
 		SoMaterial * p = new SoMaterial();
 		p->diffuseColor.setValue(0, 0, 1);
-		if (angles[ptCount] > 12 && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
+		if (angles[ptCount] > thresh && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
 			p->diffuseColor.setValue(1, 0, 0);
 		}
 		if (j == dirNum - 1){
@@ -420,6 +441,52 @@ int main(int argc, char *argv[])
 		line->addChild(ln);
 	}
 
+	// use plane.txt to fit a plane
+	ifstream planeFile("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\plane.txt");
+	vector<vector<float>> plane;
+	while (getline(planeFile, hold)) { // should be exactly 4 rows
+		k = 0;
+		found = 0; // we know there are only 2 white spaces (but must add last num)
+		while (found < 3) {
+			if (hold[k] != ' ') {
+				num += hold[k];
+			}
+			else {
+				coords[found] = stof(num);
+				temp.push_back(coords[found]);
+				found++;
+				num = "";
+			}
+			k++;
+		}
+		plane.push_back(temp); // center, dir, dir, dir
+
+	}
+	SoSeparator * drawplane = new SoSeparator;
+	root->addChild(drawplane);
+	SoMaterial * q = new SoMaterial;
+	q->diffuseColor.setValue(0, 1, 0);
+	SoCube * cube = new SoCube;
+	cube->width.setValue(5);
+	cube->height.setValue(500);
+	cube->depth.setValue(200);
+	SoRotation * rotateX = new SoRotation;
+	SoRotation * rotateY = new SoRotation;
+	SoRotation * rotate = new SoRotation;
+	//float mag1 = sqrt(pow(plane[1][0],2) + pow(plane[1][1],2) + pow(plane[1][2],2)); // axis of rotation
+	float mag2 = sqrt(pow(plane[2][0], 2) + pow(plane[2][1], 2) + pow(plane[2][2], 2)); // normal
+	float dot =  plane[2][1]; // dot with y axis is just middle element of normal
+	float angleC = 1.57 - acos(dot/(mag2));
+	rotate->rotation.setValue(SbVec3f(plane[1][0], plane[1][1], plane[1][2]), angleC);
+
+	SoTransform * move = new SoTransform;
+	move->translation.setValue(plane[0][0], plane[0][1], plane[0][2]);
+	drawplane->addChild(q);
+	drawplane->addChild(move);
+
+	drawplane->addChild(rotate);
+	
+	drawplane->addChild(cube);
 
 	ui.QuarterWidget->setSceneGraph(root); // format?? add root to widget?
 	viewer->show(); // show widget
