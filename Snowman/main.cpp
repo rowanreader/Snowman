@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
 	}
 
 	///// get all angles - concavity now
-	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\concavity.txt");
+	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\inflection.txt");
 	vector<int> concavity;
 	while (getline(ang, hold)) {
 		concavity.push_back(stof(hold));
@@ -416,7 +416,8 @@ int main(int argc, char *argv[])
 		root->addChild(line);
 		SoMaterial * p = new SoMaterial();
 		p->diffuseColor.setValue(0, 0, 1);
-		if (concavity[ptCount] == 1 && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
+		//if (concavity[ptCount] == 1 && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
+		if (concavity[ptCount] == 1 && j < dirNum-6) {
 			p->diffuseColor.setValue(1, 0, 0);
 		}
 		if (j == dirNum - 1){
