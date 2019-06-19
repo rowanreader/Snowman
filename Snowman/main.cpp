@@ -249,6 +249,7 @@ int main(int argc, char *argv[])
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <sstream>
 
 using namespace System;
 using namespace std;
@@ -276,76 +277,137 @@ int main(int argc, char *argv[])
 	root->addChild(file_root);
 	
 	// display points
-	ifstream areola("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\output2.txt");
-	
+	string file;
 	string hold;
-	string num = "";
-	int k;
-	int found;
-	float coords[3] = { 0,0,0 };
-	//cout << "Hello World" << endl;
-	while (getline(areola, hold)) {
-		k = 0;
-		found = 0; // we know there are only 2 white spaces (but must add last num)
-		while (found < 3) {
-			if (hold[k] != ' ') {
-				num += hold[k];
+	string num;
+	string normalFile;
+	string concavityFile;
+	vector<int> concave;
+	vector <float> coords;
+	vector<float> temp;
+	vector<vector<float>> normals;
+	// for each text file, open, get normal text file corresponding, display point and normal, then colour based on concavity
+	vector<vector<float>> allCoords;
+	for (int i = 1; i < 37; i++) {
+		file = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\PlaneIntersection_" + std::to_string(i) + ".txt";
+		allCoords.clear();
+		ifstream areola(file);
+		num = "";
+		int k;
+		int found;
+		
+		while (getline(areola, hold)) {
+			k = 0;
+			coords.clear();
+			found = 0; // we know there are only 2 white spaces (but must add last num)
+			while (found < 3) {
+				if (hold[k] != ' ') {
+					num += hold[k];
+				}
+				else {
+					coords.push_back(stof(num));
+					found++;
+					num = "";
+				}
+				k++;
+			}
+			allCoords.push_back(coords);
+			SoSeparator * pt = new SoSeparator;
+			//root->addChild(pt);
+			SoMaterial * o = new SoMaterial();
+			o->diffuseColor.setValue(1, 1, 1);
+			SoSphere * sphere = new SoSphere();
+			SoTransform * trans = new SoTransform();
+			sphere->radius = 1;
+			trans->translation.setValue(coords[0], coords[1], coords[2]);
+			pt->addChild(o);
+			pt->addChild(trans);
+			pt->addChild(sphere);
+			root->addChild(pt);
+		}
+
+		// get associated normal file
+		normalFile = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\normals_" + std::to_string(i) + ".txt";
+		ifstream normal(normalFile);
+		
+		// first in normals will be index value (face id) -- not anymore
+		
+		int count = 0;
+		num = "";
+
+		while (getline(normal, hold)) {
+			k = 0;
+			found = 0; // we know there are only 3 white spaces (but must add last num, exclude 1st num) -- strike that, update had normals as just 3 numbers
+
+			while (found < 3) {
+				if (hold[k] != ' ') {
+					num += hold[k];
+				}
+				else {
+					temp.push_back(stof(num));					
+					num = "";
+					found++;
+				}
+				k++;
+			}
+			normals.push_back(temp);
+			temp.clear();
+		}
+		
+		
+		// get associated concavity files
+		concavityFile = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\concavity_" + std::to_string(i) + ".txt";
+		ifstream concavity(concavityFile);
+		
+		int length = 0;
+		while (getline(concavity, hold)) {
+			concave.push_back(stoi(hold));
+			length++;
+		}
+		for (int j = 0; j < length; j++) { // because there is a point in all coords at beginning and end with no normal
+			SoSeparator * line = new SoSeparator;
+			root->addChild(line);
+			SoMaterial * p = new SoMaterial();
+			if (concave[j] == -1){
+				p->diffuseColor.setValue(0, 0, 1);
+			}
+			else if (concave[j] == 1) {
+				p->diffuseColor.setValue(1, 0, 0);
 			}
 			else {
-				coords[found] = stof(num);
-				found++;
-				num = "";
+				p->diffuseColor.setValue(0, 1, 0);
 			}
-			k++;
+			SoCoordinate3 *pt1 = new SoCoordinate3;
+			SoCoordinate3 *pt2 = new SoCoordinate3;
+			SbVec3f vec1(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+			SbVec3f vec2(50 * normals[j][0], 50 * normals[j][1], 50 * normals[j][2]);
+			SoTransform * trans = new SoTransform;
+			trans->translation.setValue(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+			pt1->point.setValue(vec1);
+			pt1->point.setValue(vec2);
+
+			SoLineSet * ln = new SoLineSet;
+			ln->numVertices.setValue(2);
+			line->addChild(p);
+			line->addChild(trans);			
+			line->addChild(pt1);
+			//line->addChild(pt2);
+			line->addChild(ln);
+			
 		}
-		SoSeparator * pt = new SoSeparator;
-		//root->addChild(pt);
-		SoMaterial * o = new SoMaterial();
-		o->diffuseColor.setValue(1, 1, 1);
-		SoSphere * sphere = new SoSphere();
-		SoTransform * trans = new SoTransform();
-		sphere->radius = 1;
-		trans->translation.setValue(coords[0], coords[1], coords[2]);
-		pt->addChild(o);
-		pt->addChild(trans);
-		pt->addChild(sphere);
-		root->addChild(pt);
+		
+		concave.clear();
+		normals.clear();
 		
 	}
 
-	ifstream normal("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\normals.txt");
-	vector<vector<float>> normals;
-	// first in normals will be index value (face id)
-	vector<float> temp;
-	int count = 0;
-	num = "";
-	
-	while (getline(normal, hold)) {
-		k = 0;
-		found = 0; // we know there are only 3 white spaces (but must add last num, exclude 1st num)
-		
-		while (found < 4) {
-			if (hold[k] != ' ') {
-				num += hold[k];
-			}
-			else {				
-				if (found > 0) {
-					temp.push_back(stof(num));					
-				}
-				num = "";
-				found++;
-			}
-			k++;
-		}
-		normals.push_back(temp);
-		temp.clear();
-	}
 
 	///// get all angles - concavity now
-	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\inflection.txt");
-	vector<int> concavity;
+	/*
+	ifstream ang("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\angles.txt");
+	vector<int> angles;
 	while (getline(ang, hold)) {
-		concavity.push_back(stof(hold));
+		angles.push_back(stof(hold));
 	}
 	
 	vector<vector<float>> allCoords;
@@ -391,7 +453,9 @@ int main(int argc, char *argv[])
 	int dirNum =49; // from matlab (actual-1 cuz 0 based index) WILL NEED TO CHANGE HERE IF CHANGES IN MATLAB
 	int ptCount = 0; // what line we are on
 	int j = 0; // where we are in the line
-	int thresh = 20; // THIS IS WHAT YOU NEED TO CHANGE IN FITPLANE TO MATCH
+	int thresh = 7; // THIS IS WHAT YOU NEED TO CHANGE IN FITPLANE TO MATCH
+
+	*/
 	/*
 	SoSeparator * zAxis = new SoSeparator;
 	root->addChild(zAxis);
@@ -409,15 +473,15 @@ int main(int argc, char *argv[])
 	zAxis->addChild(pt1);
 	zAxis->addChild(ln);
 	*/
-
+	/*
 
 	for (int i = 0; i < count; i++) {
 		SoSeparator * line = new SoSeparator;
 		root->addChild(line);
 		SoMaterial * p = new SoMaterial();
 		p->diffuseColor.setValue(0, 0, 1);
-		//if (concavity[ptCount] == 1 && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
-		if (concavity[ptCount] == 1 && j < dirNum-6) {
+		if (angles[ptCount] >= thresh && j != dirNum - 1 && j != 0){ // THRESHOLD IS HERE
+		//if (concavvity[ptCount] == 1 && j < dirNum-6) {
 			p->diffuseColor.setValue(1, 0, 0);
 		}
 		if (j == dirNum - 1){
@@ -441,6 +505,7 @@ int main(int argc, char *argv[])
 		line->addChild(pt1);
 		line->addChild(ln);
 	}
+	*/
 	/*
 	// use plane.txt to fit a plane
 	ifstream planeFile("C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\plane.txt");
