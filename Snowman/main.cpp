@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
 	vector<vector<float>> normals;
 	// for each text file, open, get normal text file corresponding, display point and normal, then colour based on concavity
 	vector<vector<float>> allCoords;
-	for (int i = 1; i < 37; i++) {
+	for (int i = 1; i < 37; i++) { // DEPENDENT ON NUMBER OF PLANES, NEED TO CHANGE i<# IF NUMBER OF PLANES CHANGES
 		file = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\PlaneIntersection_" + std::to_string(i) + ".txt";
 		allCoords.clear();
 		ifstream areola(file);
@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
 		
 		
 		// get associated concavity files
-		concavityFile = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\concavity_" + std::to_string(i) + ".txt";
+		concavityFile = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\diffConc_" + std::to_string(i) + ".txt";
 		ifstream concavity(concavityFile);
 		
 		int length = 0;
@@ -368,32 +368,30 @@ int main(int argc, char *argv[])
 			SoSeparator * line = new SoSeparator;
 			root->addChild(line);
 			SoMaterial * p = new SoMaterial();
-			if (concave[j] == -1){
+			if (concave[j] == 1){
 				p->diffuseColor.setValue(0, 0, 1);
-			}
-			else if (concave[j] == 1) {
-				p->diffuseColor.setValue(1, 0, 0);
-			}
-			else {
-				p->diffuseColor.setValue(0, 1, 0);
-			}
-			SoCoordinate3 *pt1 = new SoCoordinate3;
-			SoCoordinate3 *pt2 = new SoCoordinate3;
-			SbVec3f vec1(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
-			SbVec3f vec2(50 * normals[j][0], 50 * normals[j][1], 50 * normals[j][2]);
-			SoTransform * trans = new SoTransform;
-			trans->translation.setValue(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
-			pt1->point.setValue(vec1);
-			pt1->point.setValue(vec2);
+			//}
+			//else if (concave[j] == 1) {
+			//	p->diffuseColor.setValue(1, 0, 0);
+			//}
+			//if (concave[j] != 0) {
+				SoCoordinate3 *pt1 = new SoCoordinate3;
+				SoCoordinate3 *pt2 = new SoCoordinate3;
+				SbVec3f vec1(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+				SbVec3f vec2(50 * normals[j][0], 50 * normals[j][1], 50 * normals[j][2]);
+				SoTransform * trans = new SoTransform;
+				trans->translation.setValue(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+				pt1->point.setValue(vec1);
+				pt1->point.setValue(vec2);
 
-			SoLineSet * ln = new SoLineSet;
-			ln->numVertices.setValue(2);
-			line->addChild(p);
-			line->addChild(trans);			
-			line->addChild(pt1);
-			//line->addChild(pt2);
-			line->addChild(ln);
-			
+				SoLineSet * ln = new SoLineSet;
+				ln->numVertices.setValue(2);
+				line->addChild(p);
+				line->addChild(trans);
+				line->addChild(pt1);
+				//line->addChild(pt2);
+				line->addChild(ln);
+			}
 		}
 		
 		concave.clear();
