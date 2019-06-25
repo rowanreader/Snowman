@@ -271,18 +271,27 @@ int main(int argc, char *argv[])
 	root->ref();
 	// display breast
 	SoInput in;
-	in.openFile("S1.iv");
+	in.openFile("S1_left.iv");
 	SoSeparator* file_root = SoDB::readAll(&in);
 	
 	root->addChild(file_root);
 	
+	// 1 for only angles
+	// 2 for only concavity
+	// 3 for both angles and concavity
+	int mode;
+	mode = 1;
+
+
 	// display points
 	string file;
 	string hold;
 	string num;
 	string normalFile;
 	string concavityFile;
+	string angleFile;
 	vector<int> concave;
+	vector<int> angle;
 	vector <float> coords;
 	vector<float> temp;
 	vector<vector<float>> normals;
@@ -356,6 +365,16 @@ int main(int argc, char *argv[])
 		
 		
 		// get associated concavity files
+		
+		angleFile = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\angles_" + std::to_string(i) + ".txt";
+		ifstream angles(angleFile);
+		int length2 = 0;
+		while (getline(angles, hold)) {
+			angle.push_back(stoi(hold));
+			length2++;
+		}
+		
+		
 		concavityFile = "C:\\Users\\Jacqueline\\Documents\\MATLAB\\Jacqueline\\Deluany Distance2\\diffConc_" + std::to_string(i) + ".txt";
 		ifstream concavity(concavityFile);
 		
@@ -364,17 +383,66 @@ int main(int argc, char *argv[])
 			concave.push_back(stoi(hold));
 			length++;
 		}
+		
 		for (int j = 0; j < length; j++) { // because there is a point in all coords at beginning and end with no normal
 			SoSeparator * line = new SoSeparator;
 			root->addChild(line);
 			SoMaterial * p = new SoMaterial();
-			if (concave[j] == 1){
+			if (mode == 3 && (concave[j] == 1 || angle[j] == 1)){
 				p->diffuseColor.setValue(0, 0, 1);
 			//}
 			//else if (concave[j] == 1) {
 			//	p->diffuseColor.setValue(1, 0, 0);
 			//}
 			//if (concave[j] != 0) {
+				SoCoordinate3 *pt1 = new SoCoordinate3;
+				SoCoordinate3 *pt2 = new SoCoordinate3;
+				SbVec3f vec1(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+				SbVec3f vec2(50 * normals[j][0], 50 * normals[j][1], 50 * normals[j][2]);
+				SoTransform * trans = new SoTransform;
+				trans->translation.setValue(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+				pt1->point.setValue(vec1);
+				pt1->point.setValue(vec2);
+
+				SoLineSet * ln = new SoLineSet;
+				ln->numVertices.setValue(2);
+				line->addChild(p);
+				line->addChild(trans);
+				line->addChild(pt1);
+				//line->addChild(pt2);
+				line->addChild(ln);
+			}
+			else if (mode == 2 && concave[j] == 1) {
+				p->diffuseColor.setValue(0, 0, 1);
+				//}
+				//else if (concave[j] == 1) {
+				//	p->diffuseColor.setValue(1, 0, 0);
+				//}
+				//if (concave[j] != 0) {
+				SoCoordinate3 *pt1 = new SoCoordinate3;
+				SoCoordinate3 *pt2 = new SoCoordinate3;
+				SbVec3f vec1(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+				SbVec3f vec2(50 * normals[j][0], 50 * normals[j][1], 50 * normals[j][2]);
+				SoTransform * trans = new SoTransform;
+				trans->translation.setValue(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
+				pt1->point.setValue(vec1);
+				pt1->point.setValue(vec2);
+
+				SoLineSet * ln = new SoLineSet;
+				ln->numVertices.setValue(2);
+				line->addChild(p);
+				line->addChild(trans);
+				line->addChild(pt1);
+				//line->addChild(pt2);
+				line->addChild(ln);
+			}
+			else if (mode == 1 && angle[j] == 1) {
+				p->diffuseColor.setValue(0, 0, 1);
+				//}
+				//else if (concave[j] == 1) {
+				//	p->diffuseColor.setValue(1, 0, 0);
+				//}
+				//if (concave[j] != 0) {
 				SoCoordinate3 *pt1 = new SoCoordinate3;
 				SoCoordinate3 *pt2 = new SoCoordinate3;
 				SbVec3f vec1(allCoords[j][0], allCoords[j][1], allCoords[j][2]);
